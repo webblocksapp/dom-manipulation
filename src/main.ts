@@ -7,7 +7,7 @@ type Persona = {
   edad: number;
 };
 
-const persona: Persona = {
+let persona: Persona = {
   nombre: "",
   apellido: "",
   email: "",
@@ -22,13 +22,12 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /*html */ `
       </nav>
     </header>
     <div class="container-fluid py-2">
-      <div class="row">
+      <div class="row gy-3">
         <div class="col-12">
           <h3>Clientes</h3>
-        <div>
-      </div>
-      <div class="row">
+        </div>
         <div class="col-12">
+          <div id="mensaje"></div>
           <form class="row gy-3" id="formulario-cliente">
             <div class="col-md-6">
               <label for="nombre" class="form-label">Nombre</label>
@@ -52,6 +51,9 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /*html */ `
             </div>
           </form>
         </div>
+        <div class="col-12">
+          <div class="row gy-3" id="lista-clientes"></div>
+        </div>
       </div>
     </div>
   </main>
@@ -61,9 +63,13 @@ const nombre = document.querySelector<HTMLInputElement>('[name="nombre"]')!;
 const apellido = document.querySelector<HTMLInputElement>('[name="apellido"]')!;
 const email = document.querySelector<HTMLInputElement>('[name="email"]')!;
 const edad = document.querySelector<HTMLInputElement>('[name="edad"]')!;
+const mensaje = document.getElementById("mensaje")! as HTMLDivElement;
 const formularioCliente = document.getElementById(
   "formulario-cliente"
 )! as HTMLFormElement;
+const listaClientes = document.getElementById(
+  "lista-clientes"
+)! as HTMLDivElement;
 
 nombre.addEventListener("input", (event) => {
   persona.nombre = (event.target as HTMLInputElement).value;
@@ -90,6 +96,54 @@ formularioCliente.addEventListener("submit", (event) => {
   event.preventDefault();
   const esValido = formularioEsValido();
   if (esValido) {
-    console.log(persona);
+    crearCliente();
+    reset();
+    mensaje.innerHTML = /*html */ `
+    <div class="alert alert-success alert-dismissible" role="alert">
+      Los datos se han enviado correctamente.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    `;
+  } else {
+    mensaje.innerHTML = /*html */ `
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      Tu formulario contiene errores.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    `;
   }
+
+  const close = document.querySelector<HTMLButtonElement>(
+    '[aria-label="Close"]'
+  )!;
+  close.addEventListener("click", () => {
+    mensaje.innerHTML = "";
+  });
 });
+
+function reset() {
+  persona = {
+    nombre: "",
+    apellido: "",
+    edad: 0,
+    email: "",
+  };
+
+  formularioCliente.reset();
+}
+
+function crearCliente() {
+  const div = document.createElement("div");
+  div.classList.add("col-md-4");
+  div.innerHTML = /*html */ `
+  <div class="card">            
+    <div class="card-body">
+      <p class="card-text"><b>Nombre:</b> ${persona.nombre}</p>
+      <p class="card-text"><b>Apellido:</b> ${persona.apellido}</p>
+      <p class="card-text"><b>Email:</b> ${persona.email}</p>
+      <p class="card-text"><b>Edad:</b> ${persona.edad}</p>
+    </div>
+  </div>
+  `;
+  listaClientes.appendChild(div);
+}
